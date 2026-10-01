@@ -29,12 +29,13 @@ For the test the check ran every minute instead of every 10, and `followup_days`
 
 - A follow-up sent the same day as the first text said "our text from Wednesday". It now says "earlier today". Only reachable with follow-up gaps under a day.
 - Wording in the testing sticky note and the setup note about email.
+- For n8n's template review (Oct 1): the sticky notes were redone to n8n's rules (a yellow main note of 100 to 300 words with How it works and Setup steps, section notes of 50 words or less, no overlaps), nodes were moved so each sits inside one section note, and the settings ship blank with no example phone numbers, emails, n8n address or key. In the Code nodes the only change is the settings check, which now asks for the numbers to be filled in instead of refusing the old example numbers.
 
 The Code nodes are otherwise the ones that ran. The automated checks below ran on the final file.
 
 ## Local checks
 
-[`tests/outreach.test.js`](../tests/outreach.test.js): 47 checks against the Code node source in the workflow file, with the clock frozen. CI runs them on every push.
+[`tests/outreach.test.js`](../tests/outreach.test.js): 52 checks against the Code node source in the workflow file, with the clock frozen. CI runs them on every push.
 
 ## Not run live
 
