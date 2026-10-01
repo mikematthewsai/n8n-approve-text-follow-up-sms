@@ -61,7 +61,7 @@ const CUST = [
 ];
 
 // ---------- settings ----------
-t('S1 example numbers refused', throws(() => settingsRun('tick', {}, { owner_cell: '+15555550199' }), /example phone numbers/));
+t('S1 blank phone numbers refused', throws(() => settingsRun('tick', {}, { owner_cell: '' }), /must both be filled in/));
 t('S2 n8n address required', throws(() => settingsRun('tick', {}, { n8n_url: 'https://your-instance.app.n8n.cloud' }), /n8n_url/));
 t('S3 weak request key refused', throws(() => settingsRun('tick', {}, { request_key: 'change-me-to-a-long-random-phrase' }), /request_key/));
 t('S4 modes', settingsRun('request', { body: {} }).mode === 'request' && settingsRun('reply', { body: {} }).mode === 'reply' && settingsRun('tick').mode === 'tick');
@@ -212,7 +212,19 @@ t('S5 follow-up steps from followup_days', JSON.stringify(settingsRun('tick').cf
 {
   const raw = JSON.stringify(wf);
   t('Z1 ships with no credentials', !wf.nodes.some(n => n.credentials));
-  t('Z2 only example phone numbers in the file', !/\+1(?!555)\d{10}/.test(raw), raw.match(/\+1(?!555)\d{10}/));
+  const params = JSON.stringify(wf.nodes.map(n => n.parameters));
+  t('Z2 no phone numbers or email addresses anywhere in the node settings or code', !/\+\d{8,15}\b|\b\d{3}[-. ]\d{3}[-. ]\d{4}\b/.test(params) && !/[\w.]+@[\w-]+\.[a-z]{2,}/i.test(params), (params.match(/\+\d{8,15}\b|\b\d{3}[-. ]\d{3}[-. ]\d{4}\b|[\w.]+@[\w-]+\.[a-z]{2,}/i) || [])[0]);
+  const stickies = wf.nodes.filter(n => n.type.includes('stickyNote'));
+  const words = t => (t.match(/[A-Za-z0-9_']+/g) || []).length;
+  const main = stickies.filter(n => n.parameters.color === 1);
+  t('Z4 one yellow main note, 100 to 300 words, with How it works and Setup steps', main.length === 1 && words(main[0].parameters.content) >= 100 && words(main[0].parameters.content) <= 300 && /How it works/.test(main[0].parameters.content) && /Setup steps/.test(main[0].parameters.content), main.map(n => words(n.parameters.content)));
+  t('Z5 every other note is 50 words or less', stickies.filter(n => n.parameters.color !== 1).every(n => words(n.parameters.content) <= 50), stickies.map(n => words(n.parameters.content)));
+  const R = n => [n.position[0], n.position[1], n.position[0] + n.parameters.width, n.position[1] + n.parameters.height];
+  const hit = (a, b) => !(a[2] <= b[0] || b[2] <= a[0] || a[3] <= b[1] || b[3] <= a[1]);
+  t('Z6 no two notes overlap', stickies.every((a, i) => stickies.every((b, j) => j <= i || !hit(R(a), R(b)))));
+  const sections = stickies.filter(n => n.parameters.color === 7);
+  t('Z7 every working node sits inside exactly one section note', wf.nodes.filter(n => !n.type.includes('stickyNote')).every(n => sections.filter(sn => { const r = R(sn); return r[0] <= n.position[0] && n.position[0] + 100 <= r[2] && r[1] <= n.position[1] && n.position[1] + 100 <= r[3]; }).length === 1));
+  t('Z8 the main note is at the top left: no note starts above it, and only the test note shares its column', stickies.every(n => n === main[0] || (n.position[1] >= main[0].position[1] && (main[0].position[0] + main[0].parameters.width <= n.position[0] || (n.parameters.color === 4 && n.position[1] >= main[0].position[1] + main[0].parameters.height)))));
   t('Z3 every node has a real name and the main note is yellow', !wf.nodes.some(n => /^(Code|HTTP Request|If|Set|Webhook)\d*$/.test(n.name)) && wf.nodes.find(n => n.name === 'Sticky Note').parameters.color === 1);
 }
 
