@@ -55,7 +55,7 @@ When something happens that touches a group of your customers, the choices are u
 
 A number sends its incoming texts to one place only. If yours already goes to another system, have that system forward replies to the **Customer replied** URL, with Twilio's `From` and `Body` fields.
 
-It will not run with the example phone numbers, the example n8n address or the example `request_key` still in. The run stops in red in n8n and says why.
+It will not run until the phone numbers, the n8n address and a `request_key` are filled in. The run stops in red in n8n and says why.
 
 **Email.** Off by default, so the workflow can be published without a Gmail account. To add it, set `send_email` to true, switch on the **Email the customer** node and give it a Gmail credential. Each text then also goes by email to customers with an address. Email replies are not read: follow-ups stop on a text reply, STOP, or the page's Stop button.
 
@@ -64,11 +64,11 @@ It will not run with the example phone numbers, the example n8n address or the e
 | Setting | Default | What it does |
 | --- | --- | --- |
 | `business_name` | `Your Business` | `{business_name}` in messages |
-| `business_number` | `+15555550100` | Your Twilio number |
-| `owner_cell` | `+15555550199` | Where approval links, replies and wrap-ups go |
+| `business_number` | blank | Your Twilio number, with + and the country code |
+| `owner_cell` | blank | Where approval links, replies and wrap-ups go |
 | `timezone` | `America/New_York` | For customer hours and your quiet hours |
-| `n8n_url` | `https://your-instance.app.n8n.cloud` | Used to build the approval links |
-| `request_key` | an example | Every request must include it as `key` |
+| `n8n_url` | blank | The address of your n8n, used to build the approval links |
+| `request_key` | blank | A long random phrase of your own, 12 characters or more. Every request must include it as `key` |
 | `require_consent` | `true` | Only text customers marked `ok_to_text` |
 | `cooldown_days` | `30` | Skip anyone texted by this workflow in this many days. `0` turns it off |
 | `followup_days` | `2, 5` | Days after the previous text for each follow-up. Blank means no follow-ups |
@@ -93,7 +93,7 @@ On n8n 2.x a change to a published workflow does not reach the running copy unti
 
 ## Tests
 
-- [`tests/outreach.test.js`](tests/outreach.test.js) runs the Code node source straight out of the workflow file with the clock frozen, through the whole life of a request: 47 checks covering settings, the request key, consent and every skip reason, the approval page (wrong code, escaping, opening changes nothing), approve, cancel, stop, expiry, customer hours, your quiet hours, follow-up timing and wording, replies, STOP and START, Twilio refusals and error 21610, email, the wrap-up, and that the file ships with no credentials. `cd tests && npm install && node outreach.test.js`. CI runs it on every push.
+- [`tests/outreach.test.js`](tests/outreach.test.js) runs the Code node source straight out of the workflow file with the clock frozen, through the whole life of a request: 52 checks covering settings, the request key, consent and every skip reason, the approval page (wrong code, escaping, opening changes nothing), approve, cancel, stop, expiry, customer hours, your quiet hours, follow-up timing and wording, replies, STOP and START, Twilio refusals and error 21610, email, the wrap-up, and that the file ships with no credentials, no phone numbers or emails, and sticky notes that follow n8n's template rules. `cd tests && npm install && node outreach.test.js`. CI runs it on every push.
 - [`docs/VERIFIED-RESULTS.md`](docs/VERIFIED-RESULTS.md) has the live runs in a real n8n with a real Twilio number.
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) explains the design choices.
 
