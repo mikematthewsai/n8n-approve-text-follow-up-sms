@@ -13,8 +13,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        200,
-        200
+        700,
+        100
       ],
       "webhookId": "fbfd8698-2706-545e-a5c3-bf3aff676577"
     },
@@ -29,8 +29,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        200,
-        380
+        700,
+        320
       ],
       "webhookId": "0624cada-3ad2-5983-ba6b-3193ed3f7282"
     },
@@ -46,8 +46,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        200,
-        560
+        700,
+        540
       ],
       "webhookId": "546b0ed0-773d-5a90-a8ba-b1303df556f6"
     },
@@ -63,8 +63,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        200,
-        740
+        700,
+        760
       ],
       "webhookId": "19294b3d-5efe-5aad-b860-af48a9c059e3"
     },
@@ -84,8 +84,8 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        200,
-        920
+        700,
+        980
       ]
     },
     {
@@ -102,13 +102,13 @@
               "id": "c95a6c1e-9b78-5035-9521-eb605b16cd93",
               "name": "business_number",
               "type": "string",
-              "value": "+15555550100"
+              "value": ""
             },
             {
               "id": "2ae23d5d-125b-59be-a7d1-424636cb76f5",
               "name": "owner_cell",
               "type": "string",
-              "value": "+15555550199"
+              "value": ""
             },
             {
               "id": "3cdf3477-f14e-5cb5-be4c-e8e81e558c6d",
@@ -120,13 +120,13 @@
               "id": "208b87ca-e08d-520d-8d65-207bcb37f562",
               "name": "n8n_url",
               "type": "string",
-              "value": "https://your-instance.app.n8n.cloud"
+              "value": ""
             },
             {
               "id": "8b275296-9ea0-5c38-ba78-269efcf3a6d9",
               "name": "request_key",
               "type": "string",
-              "value": "change-me-to-a-long-random-phrase"
+              "value": ""
             },
             {
               "id": "e84cee20-5ac3-5104-89e1-6944ad3fe1b6",
@@ -221,21 +221,21 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        460,
-        560
+        960,
+        540
       ]
     },
     {
       "parameters": {
-        "jsCode": "// Checks Your settings and works out what started this run: a new request, the approval page, an\n// approve or cancel button, a customer's reply, or the 10 minute check for texts that are due.\nconst s = $('Your settings').first().json;\nconst phone = v => {\n  const raw = String(v || '').trim();\n  const digits = raw.replace(/\\D/g, '');\n  if (!digits) return '';\n  if (raw.startsWith('+') && digits.length >= 8 && digits.length <= 15) return '+' + digits;\n  if (digits.length === 10) return '+1' + digits;\n  if (digits.length === 11 && digits.startsWith('1')) return '+' + digits;\n  return '';\n};\nconst inWindow = (t, start, end) => {\n  const [sh, sm] = start.split(':').map(Number), [eh, em] = end.split(':').map(Number);\n  const m = t.hour * 60 + t.minute, a = sh * 60 + sm, b = eh * 60 + em;\n  return a === b ? false : a < b ? (m >= a && m < b) : (m >= a || m < b);\n};\nconst fill = (tpl, vals) => String(tpl).replace(/\\{(\\w+)\\}/g, (m, k) => (k in vals ? vals[k] : m));\nconst esc = v => String(v === undefined || v === null ? '' : v).replace(/[&<>\"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&#39;' }[ch]));\nconst firstName = n => String(n || '').trim().split(/\\s+/)[0] || 'there';\nconst ran = name => { try { return $(name).isExecuted; } catch (e) { return false; } };\nconst num = (v, d) => (v === '' || v === null || v === undefined || isNaN(Number(v))) ? d : Number(v);\nconst bool = (v, d) => (v === undefined || v === null || v === '') ? d : !['false', 'no', 'off', '0'].includes(String(v).trim().toLowerCase());\nconst hhmm = (v, d) => /^([01]?\\d|2[0-3]):[0-5]\\d$/.test(String(v || '').trim()) ? String(v).trim().padStart(5, '0') : d;\n\nconst business_number = phone(s.business_number);\nconst owner_cell = phone(s.owner_cell);\nif (!business_number || !owner_cell) {\n  throw new Error('Your settings: business_number and owner_cell must both be phone numbers, like +15551234567.');\n}\nif (['+15555550100', '+15555550199'].includes(business_number) || ['+15555550100', '+15555550199'].includes(owner_cell)) {\n  throw new Error('Your settings: replace the example phone numbers with your Twilio number and your cell before you publish this.');\n}\nconst timezone = String(s.timezone || 'America/New_York').trim();\nif (!DateTime.now().setZone(timezone).isValid) {\n  throw new Error('Your settings: \"' + timezone + '\" is not a time zone n8n knows. Use a name like America/New_York.');\n}\nconst n8n_url = String(s.n8n_url || '').trim().replace(/\\/+$/, '');\nif (!/^https?:\\/\\/\\S+$/.test(n8n_url) || /your-instance/.test(n8n_url)) {\n  throw new Error('Your settings: n8n_url must be the address of your n8n, like https://yourname.app.n8n.cloud. The approval links use it.');\n}\nconst request_key = String(s.request_key || '').trim();\nif (request_key.length < 12 || /change-me/i.test(request_key)) {\n  throw new Error('Your settings: request_key must be a long random phrase of your own (12 characters or more). Anything that sends requests must include it.');\n}\nconst gaps = String(s.followup_days === undefined ? '2, 5' : s.followup_days).split(',').map(x => Number(x.trim())).filter(x => x > 0 && x <= 60);\nconst followups = [s.followup_1, s.followup_2, s.followup_3].map(x => String(x || '').trim());\nconst DEFAULT_FOLLOWUP = [\n  'Hi {first_name}, {business_name} again, following up on our text from {sent_day}. If you would like a hand, just reply here.',\n  'Last check-in from {business_name}, {first_name}. If you need anything, reply here any time.',\n  'Hi {first_name}, one more note from {business_name}. Reply here if we can help.',\n];\nconst steps = gaps.map((g, i) => ({ after_days: g, text: followups[i] || DEFAULT_FOLLOWUP[Math.min(i, 2)] }));\n\nconst cfg = {\n  business_name: String(s.business_name || 'your business').trim(),\n  business_number, owner_cell, timezone, n8n_url, request_key,\n  require_consent: bool(s.require_consent, true),\n  cooldown_days: Math.max(0, num(s.cooldown_days, 30)),\n  steps,\n  optout_line: String(s.optout_line === undefined ? 'Reply STOP to opt out.' : s.optout_line).trim(),\n  customer_hours_start: hhmm(s.customer_hours_start, '09:00'),\n  customer_hours_end: hhmm(s.customer_hours_end, '20:00'),\n  quiet_start: hhmm(s.quiet_start, '21:00'),\n  quiet_end: hhmm(s.quiet_end, '07:00'),\n  approval_hours: Math.max(1, num(s.approval_hours, 48)),\n  max_per_run: Math.max(1, Math.min(200, num(s.max_per_run, 40))),\n  send_email: bool(s.send_email, false),\n  email_subject: String(s.email_subject || 'A quick note from {business_name}').trim(),\n};\n\nlet mode = 'tick', input = {};\nif (ran('New outreach request')) { mode = 'request'; input = $('New outreach request').first().json; }\nelse if (ran('Approval page opened')) { mode = 'page'; input = $('Approval page opened').first().json; }\nelse if (ran('Approve or cancel')) { mode = 'decide'; input = $('Approve or cancel').first().json; }\nelse if (ran('Customer replied')) { mode = 'reply'; input = $('Customer replied').first().json; }\n\nreturn [{ json: { mode, cfg, input } }];\n"
+        "jsCode": "// Checks Your settings and works out what started this run: a new request, the approval page, an\n// approve or cancel button, a customer's reply, or the 10 minute check for texts that are due.\nconst s = $('Your settings').first().json;\nconst phone = v => {\n  const raw = String(v || '').trim();\n  const digits = raw.replace(/\\D/g, '');\n  if (!digits) return '';\n  if (raw.startsWith('+') && digits.length >= 8 && digits.length <= 15) return '+' + digits;\n  if (digits.length === 10) return '+1' + digits;\n  if (digits.length === 11 && digits.startsWith('1')) return '+' + digits;\n  return '';\n};\nconst inWindow = (t, start, end) => {\n  const [sh, sm] = start.split(':').map(Number), [eh, em] = end.split(':').map(Number);\n  const m = t.hour * 60 + t.minute, a = sh * 60 + sm, b = eh * 60 + em;\n  return a === b ? false : a < b ? (m >= a && m < b) : (m >= a || m < b);\n};\nconst fill = (tpl, vals) => String(tpl).replace(/\\{(\\w+)\\}/g, (m, k) => (k in vals ? vals[k] : m));\nconst esc = v => String(v === undefined || v === null ? '' : v).replace(/[&<>\"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&#39;' }[ch]));\nconst firstName = n => String(n || '').trim().split(/\\s+/)[0] || 'there';\nconst ran = name => { try { return $(name).isExecuted; } catch (e) { return false; } };\nconst num = (v, d) => (v === '' || v === null || v === undefined || isNaN(Number(v))) ? d : Number(v);\nconst bool = (v, d) => (v === undefined || v === null || v === '') ? d : !['false', 'no', 'off', '0'].includes(String(v).trim().toLowerCase());\nconst hhmm = (v, d) => /^([01]?\\d|2[0-3]):[0-5]\\d$/.test(String(v || '').trim()) ? String(v).trim().padStart(5, '0') : d;\n\nconst business_number = phone(s.business_number);\nconst owner_cell = phone(s.owner_cell);\nif (!business_number || !owner_cell) {\n  throw new Error('Your settings: business_number and owner_cell must both be filled in with full phone numbers: a plus sign, the country code, then the number.');\n}\nconst timezone = String(s.timezone || 'America/New_York').trim();\nif (!DateTime.now().setZone(timezone).isValid) {\n  throw new Error('Your settings: \"' + timezone + '\" is not a time zone n8n knows. Use a name like America/New_York.');\n}\nconst n8n_url = String(s.n8n_url || '').trim().replace(/\\/+$/, '');\nif (!/^https?:\\/\\/\\S+$/.test(n8n_url) || /your-instance/.test(n8n_url)) {\n  throw new Error('Your settings: n8n_url must be the address of your n8n, like https://yourname.app.n8n.cloud. The approval links use it.');\n}\nconst request_key = String(s.request_key || '').trim();\nif (request_key.length < 12 || /change-me/i.test(request_key)) {\n  throw new Error('Your settings: request_key must be a long random phrase of your own (12 characters or more). Anything that sends requests must include it.');\n}\nconst gaps = String(s.followup_days === undefined ? '2, 5' : s.followup_days).split(',').map(x => Number(x.trim())).filter(x => x > 0 && x <= 60);\nconst followups = [s.followup_1, s.followup_2, s.followup_3].map(x => String(x || '').trim());\nconst DEFAULT_FOLLOWUP = [\n  'Hi {first_name}, {business_name} again, following up on our text from {sent_day}. If you would like a hand, just reply here.',\n  'Last check-in from {business_name}, {first_name}. If you need anything, reply here any time.',\n  'Hi {first_name}, one more note from {business_name}. Reply here if we can help.',\n];\nconst steps = gaps.map((g, i) => ({ after_days: g, text: followups[i] || DEFAULT_FOLLOWUP[Math.min(i, 2)] }));\n\nconst cfg = {\n  business_name: String(s.business_name || 'your business').trim(),\n  business_number, owner_cell, timezone, n8n_url, request_key,\n  require_consent: bool(s.require_consent, true),\n  cooldown_days: Math.max(0, num(s.cooldown_days, 30)),\n  steps,\n  optout_line: String(s.optout_line === undefined ? 'Reply STOP to opt out.' : s.optout_line).trim(),\n  customer_hours_start: hhmm(s.customer_hours_start, '09:00'),\n  customer_hours_end: hhmm(s.customer_hours_end, '20:00'),\n  quiet_start: hhmm(s.quiet_start, '21:00'),\n  quiet_end: hhmm(s.quiet_end, '07:00'),\n  approval_hours: Math.max(1, num(s.approval_hours, 48)),\n  max_per_run: Math.max(1, Math.min(200, num(s.max_per_run, 40))),\n  send_email: bool(s.send_email, false),\n  email_subject: String(s.email_subject || 'A quick note from {business_name}').trim(),\n};\n\nlet mode = 'tick', input = {};\nif (ran('New outreach request')) { mode = 'request'; input = $('New outreach request').first().json; }\nelse if (ran('Approval page opened')) { mode = 'page'; input = $('Approval page opened').first().json; }\nelse if (ran('Approve or cancel')) { mode = 'decide'; input = $('Approve or cancel').first().json; }\nelse if (ran('Customer replied')) { mode = 'reply'; input = $('Customer replied').first().json; }\n\nreturn [{ json: { mode, cfg, input } }];\n"
       },
       "id": "b98ed626-fe2f-5eb4-893d-00a6447891f8",
       "name": "Read your settings",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        680,
-        560
+        1180,
+        540
       ]
     },
     {
@@ -371,8 +371,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        900,
-        560
+        1400,
+        540
       ]
     },
     {
@@ -384,7 +384,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1160,
+        1720,
         200
       ]
     },
@@ -409,7 +409,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1380,
+        1940,
         200
       ]
     },
@@ -422,8 +422,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1160,
-        470
+        1720,
+        420
       ]
     },
     {
@@ -446,8 +446,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1380,
-        470
+        1940,
+        420
       ]
     },
     {
@@ -459,8 +459,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1160,
-        740
+        1720,
+        860
       ]
     },
     {
@@ -483,8 +483,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1380,
-        740
+        1940,
+        860
       ]
     },
     {
@@ -496,8 +496,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1640,
-        740
+        2260,
+        400
       ]
     },
     {
@@ -531,8 +531,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1860,
-        660
+        2480,
+        400
       ]
     },
     {
@@ -561,8 +561,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2080,
-        660
+        2700,
+        400
       ]
     },
     {
@@ -574,8 +574,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2300,
-        660
+        2920,
+        400
       ]
     },
     {
@@ -615,8 +615,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2520,
-        660
+        3140,
+        400
       ]
     },
     {
@@ -628,8 +628,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2740,
-        660
+        3360,
+        400
       ]
     },
     {
@@ -663,8 +663,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1860,
-        900
+        2480,
+        860
       ]
     },
     {
@@ -676,8 +676,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2080,
-        900
+        2700,
+        860
       ]
     },
     {
@@ -695,8 +695,8 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        2300,
-        900
+        2920,
+        860
       ],
       "onError": "continueRegularOutput",
       "webhookId": "a5982b52-e288-5c56-9678-5481666b2ee5",
@@ -704,9 +704,9 @@
     },
     {
       "parameters": {
-        "content": "## Approve, text, follow up, stop on reply\n\n**Who it is for:** any business that learns about something that touches a group of its customers (a storm, a recall, an outage, a price change) and wants to reach them without blasting anyone by accident.\n\n**How it works**\n1. Something posts a request to **New outreach request**: a title, a message and a list of customers. The weather watch template does this, and so can any other workflow.\n2. It checks who can be texted (valid phone, ok to text, not opted out, not texted in the last cooldown_days) and texts you a link.\n3. The link opens a page with the message as a customer would see it and the list. Nothing goes out until you press Approve. Opening the link never sends anything.\n4. Every 10 minutes it sends what is due, only between customer_hours_start and customer_hours_end, then follows up after followup_days if there is no reply.\n5. A reply ends that person's follow-ups and is texted to you. STOP ends them and keeps the number off future requests. When everyone is finished you get a wrap-up.\n\n**Setup**\n1. Add a Twilio credential to **Find your Twilio account** and **Send the texts**. Email is off: to add it, set send_email to true, switch on **Email the customer** and give it a Gmail credential.\n2. Fill in **Your settings**, including your n8n address and a long random request_key.\n3. Publish, then point your Twilio number's incoming messages webhook (HTTP POST) at the production URL of **Customer replied**. A number can only send incoming texts to one place, so if yours already goes elsewhere, forward replies here from there.\n\nOnly text customers who agreed to hear from you. Some states limit contacting homeowners right after a disaster: check yours.",
-        "height": 660,
-        "width": 1120,
+        "content": "## Approve, text, follow up and stop on reply\nFor any business that needs to reach a group of customers about something that just happened, like a storm, a recall or an outage, without texting anyone by accident.\n\n### How it works\n1. Another workflow posts a request to **New outreach request**: a title, a message and a list of customers.\n2. It keeps only customers who can be texted: valid phone, marked ok to text, not opted out, not texted recently. Then it texts you an approval link.\n3. The link opens a page showing the exact first text and the list. Nothing is sent until you press Approve.\n4. Every 10 minutes it sends what is due during customer hours, then follows up after followup_days if there is no reply.\n5. A reply ends that person's follow-ups and is texted to you. STOP opts them out of everything. You get a wrap-up when everyone is finished.\n\n### Setup steps\n1. Add a Twilio credential to **Find your Twilio account** and **Send the texts**.\n2. In **Your settings**, enter your Twilio number, your cell, your n8n address and a long random request_key.\n3. Publish, then set your Twilio number's incoming message webhook to the production URL of **Customer replied**.\n4. Optional email: set send_email to true, switch on **Email the customer** and add a Gmail credential.\n\nOnly text customers who agreed to hear from you.",
+        "height": 670,
+        "width": 640,
         "color": 1
       },
       "id": "c9e088c4-7997-5ff2-9b53-5c72899f5b2e",
@@ -714,15 +714,15 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        140,
-        -560
+        -80,
+        -100
       ]
     },
     {
       "parameters": {
-        "content": "### Trying it out\nPost a request with curl or from the weather watch template, using your own cell as the only customer (ok_to_text yes). Open the link, press Approve, and wait for the 10 minute check. Reply to the text and it comes back to you. followup_days are in days, and decimals work for a quick test: 0.002 is about 3 minutes.\n\nChanged a setting while it is published? Publish again, or the running version keeps the old settings.",
-        "height": 330,
-        "width": 900,
+        "content": "### Try it first\nPost a request with your own cell as the only customer and followup_days set to 0.002, about 3 minutes. Open the link, press Approve, then reply to the text.",
+        "height": 200,
+        "width": 640,
         "color": 4
       },
       "id": "258f8637-5350-5c30-94a9-11fae98df441",
@@ -730,15 +730,15 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1280,
-        -300
+        -80,
+        610
       ]
     },
     {
       "parameters": {
-        "content": "### 1. Five ways in\nA request, the approval page, its buttons, a customer's text, and the 10 minute check. They all go through Your settings, so there is one place to change anything.",
-        "height": 920,
-        "width": 1000,
+        "content": "### 1. Five ways in\nA request, the approval page, its buttons, a customer's reply and the 10 minute check. All five read Your settings, then the switch sends each to its branch.",
+        "height": 1240,
+        "width": 960,
         "color": 7
       },
       "id": "076c1f80-a26a-5edc-bfcc-f22ebcea3b78",
@@ -746,14 +746,14 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        140,
-        120
+        620,
+        -100
       ]
     },
     {
       "parameters": {
-        "content": "### 2. Requests, the page and replies\nRequests need the request_key. The page only changes anything on a button press. A reply is answered to Twilio with an empty response, so the customer gets no automatic text back from here.",
-        "height": 860,
+        "content": "### 2. Requests and the approval page\nRequests must carry request_key. Opening the page changes nothing; only the Approve, Cancel and Stop buttons do.",
+        "height": 580,
         "width": 480,
         "color": 7
       },
@@ -762,15 +762,15 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1120,
-        60
+        1640,
+        0
       ]
     },
     {
       "parameters": {
-        "content": "### 3. Send what is due\nYour texts wait out your quiet hours. Customer texts only go out in customer hours, at most max_per_run per check. Twilio error 21610 means the number opted out with the carrier, so it is treated like STOP. Other refusals are tried up to three times.",
-        "height": 560,
-        "width": 1340,
+        "content": "### 3. Customer replies\nTwilio posts incoming texts here. STOP opts out, START opts back in, any other reply goes to you. Twilio gets an empty answer.",
+        "height": 360,
+        "width": 480,
         "color": 7
       },
       "id": "cbe2600c-38ab-566b-95fc-8f6d6c04a44c",
@@ -778,8 +778,40 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1600,
-        540
+        1640,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### 4. Send what is due\nYour texts wait out quiet hours. Customer texts go only in customer hours, up to max_per_run per check. Error 21610 counts as STOP; other refusals retry three times.",
+        "height": 360,
+        "width": 1360,
+        "color": 7
+      },
+      "id": "f057b47b-811b-5405-a565-ef5ee385f456",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2180,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### 5. Optional email\nOff by default. Set send_email to true, switch on this node and add Gmail to email each text as well.",
+        "height": 360,
+        "width": 700,
+        "color": 7
+      },
+      "id": "ab0e734f-09e8-5455-92e6-79ab7c04708c",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        660
       ]
     }
   ],
